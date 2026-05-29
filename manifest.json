@@ -1,4 +1,4 @@
-{
+﻿{
   "name": "品牌金价 · 每日看板",
   "short_name": "金价看板",
   "description": "国内15+品牌金店每日金价与回收价一览",
@@ -12,3 +12,4 @@
     { "src": "./icons/icon-512.svg", "sizes": "512x512", "type": "image/svg+xml", "purpose": "any maskable" }
   ]
 }
+

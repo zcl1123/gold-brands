@@ -8,8 +8,7 @@
   <meta name="theme-color" content="#0a0a0f">
   <title>品牌金价 · 四川看板</title>
   <link rel="manifest" href="./manifest.json">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js">
-</script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
   <style>
     :root {
       --bg: #08080d;
@@ -41,13 +40,69 @@
     .header .sub { font-size:0.62rem; color:var(--muted); margin-top:2px; }
     .header .sub span { color:var(--gold); }
 
+    /* ── Live Gold Price ── */
+    .live-card {
+      background: linear-gradient(145deg, #0a1a2e 0%, #0d1225 40%, #0a0f1a 100%);
+      border: 1px solid rgba(0,180,255,0.2);
+      border-radius: 16px;
+      padding: 14px 18px 12px;
+      margin: 10px 0 14px;
+    }
+    .live-header {
+      display:flex; align-items:center; justify-content:center; gap:8px;
+      margin-bottom:10px;
+    }
+    .live-dot {
+      width:8px; height:8px; background:#00e676;
+      border-radius:50%; display:inline-block;
+      animation:livePulse 1.5s infinite;
+      box-shadow:0 0 6px #00e676;
+    }
+    @keyframes livePulse {
+      0%,100% { opacity:1; transform:scale(1); }
+      50% { opacity:0.4; transform:scale(1.6); }
+    }
+    .live-badge {
+      font-size:0.62rem; font-weight:700; color:#00b0ff;
+      letter-spacing:2px;
+    }
+    .live-time {
+      font-size:0.55rem; color:var(--muted); margin-left:auto;
+    }
+    .live-prices {
+      display:flex; gap:12px;
+    }
+    .live-price-box {
+      flex:1; text-align:center;
+      background:rgba(255,255,255,0.03);
+      border-radius:10px; padding:10px 6px;
+    }
+    .live-label {
+      font-size:0.52rem; color:var(--muted); margin-bottom:4px;
+    }
+    .live-value {
+      font-size:1.5rem; font-weight:900; color:#fff; line-height:1;
+      letter-spacing:-1px;
+    }
+    .live-value .u {
+      font-size:0.58rem; font-weight:500; color:var(--sub); margin-left:2px;
+    }
+    .live-compare {
+      text-align:center; margin-top:10px; font-size:0.6rem; color:var(--sub);
+    }
+    .live-compare .up { color:var(--red); font-weight:600; }
+    .live-compare .down { color:var(--green); font-weight:600; }
+    .live-err {
+      text-align:center; font-size:0.6rem; color:var(--muted); padding:8px 0;
+    }
+
     /* ── Base Price Hero ── */
     .hero {
       background: linear-gradient(145deg, #1a1400 0%, #141008 40%, #0d0d05 100%);
       border: 1px solid rgba(240,185,11,0.18);
       border-radius: 16px;
       padding: 16px 18px 12px;
-      margin: 10px 0 14px;
+      margin: 0 0 14px;
       text-align: center;
     }
     .hero-badge {
@@ -107,7 +162,6 @@
     .b-card:active { background:#181828; }
     .b-card.top { border-color:rgba(240,185,11,0.25); background:linear-gradient(135deg,#1a1a28 0%,rgba(240,185,11,0.03) 100%); }
 
-    /* Brand logo */
     .b-logo {
       width:38px; height:38px; border-radius:50%;
       display:flex; align-items:center; justify-content:center;
@@ -115,7 +169,6 @@
       flex-shrink:0;
     }
 
-    /* Brand info */
     .b-info { flex:1; min-width:0; }
     .b-name-row { display:flex; align-items:center; gap:6px; margin-bottom:3px; }
     .b-name { font-size:0.88rem; font-weight:600; }
@@ -130,7 +183,6 @@
     .b-bb { font-size:0.62rem; color:var(--sub); }
     .b-bb .bbv { color:#ff9800; font-weight:500; }
 
-    /* Price */
     .b-price { text-align:right; flex-shrink:0; }
     .b-price .bp-now { font-size:1.25rem; font-weight:800; color:var(--gold); line-height:1; }
     .b-price .bp-now .u { font-size:0.58rem; color:var(--sub); font-weight:500; margin-left:1px; }
@@ -139,7 +191,6 @@
     .b-price .bp-chg.up { color:var(--red); }
     .b-price .bp-chg.down { color:var(--green); }
 
-    /* Top badge */
     .b-top-badge {
       position:absolute; top:-1px; right:10px;
       font-size:0.5rem; color:var(--gold); font-weight:700;
@@ -151,7 +202,7 @@
     .footer { text-align:center; padding:20px 0 10px; font-size:0.55rem; color:var(--muted); line-height:1.7; }
     .footer a { color:#c9970a; text-decoration:none; }
 
-    /* Error */
+    /* Error / skeleton */
     .err { background:rgba(255,82,82,.08); border:1px solid rgba(255,82,82,.2); border-radius:10px; padding:10px; text-align:center; font-size:0.7rem; color:var(--red); margin-bottom:10px; display:none; }
     .err.show { display:block; }
     .skeleton { background:linear-gradient(90deg,var(--card) 25%,#1a1a2e 50%,var(--card) 75%); background-size:200% 100%; animation:sh 1.5s infinite; border-radius:8px; }
@@ -166,9 +217,29 @@
   <div class="sub">更新于 <span id="hDate">--</span> 丨 数据来源：<span>金投网</span></div>
 </div>
 
+<!-- 实时国际金价 -->
+<div class="live-card" id="liveCard">
+  <div class="live-header">
+    <span class="live-dot"></span>
+    <span class="live-badge">实时国际金价</span>
+    <span class="live-time" id="liveTime">加载中...</span>
+  </div>
+  <div class="live-prices">
+    <div class="live-price-box">
+      <div class="live-label">国际金价 (美元/盎司)</div>
+      <div class="live-value skeleton" id="liveUsd" style="width:120px;margin:0 auto;">--</div>
+    </div>
+    <div class="live-price-box">
+      <div class="live-label">折算人民币 (元/克)</div>
+      <div class="live-value skeleton" id="liveCny" style="width:120px;margin:0 auto;">--</div>
+    </div>
+  </div>
+  <div class="live-compare" id="liveCompare"></div>
+</div>
+
 <!-- 大盘金价 -->
 <div class="hero" id="heroCard">
-  <div class="hero-badge">大盘基础金价</div>
+  <div class="hero-badge">每日基准金价</div>
   <div class="hero-price skeleton" id="hPrice" style="width:180px;height:50px;margin:0 auto;">--</div>
   <div class="hero-row">
     <div>零售(金条) <span class="hv" id="hRetail">--</span></div>
@@ -187,7 +258,7 @@
   <div class="trend-wrap"><canvas id="trendChart"></canvas></div>
 </div>
 
-<div class="rbar"><span class="dot"></span>下拉刷新 · 每日10:30更新 · 四川省内品牌</div>
+<div class="rbar"><span class="dot"></span>下拉刷新 · 每日10:30更新品牌价 · 国际金价每60秒实时刷新</div>
 <div class="err" id="errBar">网络异常，显示缓存数据</div>
 
 <!-- 品牌列表 -->
@@ -195,6 +266,7 @@
 
 <div class="footer">
   数据来源：金投网（cngold.org）品牌金店每日金价汇总<br>
+  实时金价来源：metals.live 国际市场现货金价<br>
   以上价格仅供参考 · 不含工费 · 以门店实际报价为准<br>
   <a href="https://m.cngold.org/gold/" target="_blank">查看金投网原始数据 →</a>
 </div>
@@ -202,7 +274,18 @@
 <script>
 // ========== CONFIG ==========
 const DATA_URL = './data.json';
-const CACHE_KEY = 'gold_sc_v4';
+const CACHE_KEY = 'gold_sc_v5';
+const LIVE_CACHE_KEY = 'gold_live_v1';
+
+// 金价 API 源（按顺序尝试）
+const GOLD_APIS = [
+  'https://api.metals.live/v1/spot/gold',
+  'https://api.metals.live/v1/spot/XAU'
+];
+const FX_API = 'https://api.frankfurter.app/latest?from=USD&to=CNY';
+
+// 盎司转克常量
+const OZ_TO_GRAM = 31.1035;
 
 // Brand logo colors
 const BRAND_COLORS = {
@@ -220,17 +303,157 @@ function brandLogo(name) {
 }
 
 let trendChart = null;
+let dailyData = null;
+let liveTimer = null;
+
+// ========== REAL-TIME GOLD PRICE ==========
+async function fetchLiveGold() {
+  let usdPrice = null;
+  let usdRate = null;
+
+  // 尝试获取国际金价（美元/盎司）
+  for (const api of GOLD_APIS) {
+    try {
+      const res = await fetch(api, { signal: AbortSignal.timeout(8000) });
+      if (res.ok) {
+        const json = await res.json();
+        // metals.live 返回 [{timestamp, price}] 数组
+        const item = Array.isArray(json) ? json[0] : json;
+        if (item && typeof item.price === 'number' && item.price > 0) {
+          usdPrice = item.price;
+          break;
+        }
+      }
+    } catch(e) { continue; }
+  }
+
+  // 获取美元兑人民币汇率
+  try {
+    const res = await fetch(FX_API, { signal: AbortSignal.timeout(8000) });
+    if (res.ok) {
+      const json = await res.json();
+      if (json.rates && json.rates.CNY) {
+        usdRate = json.rates.CNY;
+      }
+    }
+  } catch(e) {}
+
+  if (usdPrice && usdRate) {
+    const cnyPerGram = (usdPrice / OZ_TO_GRAM) * usdRate;
+    return {
+      usdPrice: usdPrice,
+      cnyPrice: cnyPerGram,
+      usdRate: usdRate,
+      time: new Date().toLocaleTimeString('zh-CN', {hour12: false}),
+      success: true
+    };
+  }
+
+  // 部分成功：只有金价没有汇率
+  if (usdPrice) {
+    return {
+      usdPrice: usdPrice,
+      cnyPrice: null,
+      usdRate: null,
+      time: new Date().toLocaleTimeString('zh-CN', {hour12: false}),
+      success: true
+    };
+  }
+
+  return { success: false };
+}
+
+function renderLivePrice(live) {
+  const usdEl = document.getElementById('liveUsd');
+  const cnyEl = document.getElementById('liveCny');
+  const timeEl = document.getElementById('liveTime');
+  const compareEl = document.getElementById('liveCompare');
+
+  if (!live.success) {
+    usdEl.textContent = '--';
+    usdEl.classList.remove('skeleton');
+    usdEl.style = '';
+    cnyEl.textContent = '--';
+    cnyEl.classList.remove('skeleton');
+    cnyEl.style = '';
+    timeEl.textContent = '获取失败';
+    compareEl.innerHTML = '<span style="color:#888">国际金价暂不可用，请稍后重试</span>';
+    return;
+  }
+
+  usdEl.textContent = '$' + live.usdPrice.toFixed(2);
+  usdEl.classList.remove('skeleton');
+  usdEl.style = '';
+  timeEl.textContent = live.time;
+
+  if (live.cnyPrice !== null) {
+    cnyEl.textContent = '¥' + live.cnyPrice.toFixed(2);
+    cnyEl.classList.remove('skeleton');
+    cnyEl.style = '';
+
+    // 与每日基准价对比
+    if (dailyData && dailyData.basePrice) {
+      const basePrice = dailyData.basePrice.price;
+      const diff = live.cnyPrice - basePrice;
+      const diffPct = ((diff / basePrice) * 100).toFixed(2);
+      if (Math.abs(diff) > 0.01) {
+        const isUp = diff > 0;
+        const cls = isUp ? 'up' : 'down';
+        const sign = isUp ? '+' : '';
+        compareEl.innerHTML = `较基准价 <span class="${cls}">${sign}¥${diff.toFixed(2)} (${sign}${diffPct}%)</span> 丨 汇率 ${live.usdRate.toFixed(4)}`;
+      } else {
+        compareEl.innerHTML = `与基准价持平 丨 汇率 ${live.usdRate.toFixed(4)}`;
+      }
+    } else {
+      compareEl.innerHTML = `参考汇率 USD/CNY ${live.usdRate.toFixed(4)}`;
+    }
+  } else {
+    cnyEl.textContent = '¥' + live.usdPrice.toFixed(2);
+    cnyEl.classList.remove('skeleton');
+    cnyEl.style = '';
+    compareEl.textContent = '汇率获取失败，仅显示美元价格';
+  }
+
+  // 缓存实时数据
+  try { localStorage.setItem(LIVE_CACHE_KEY, JSON.stringify(live)); } catch(e) {}
+}
+
+function getCachedLive() {
+  try {
+    const d = JSON.parse(localStorage.getItem(LIVE_CACHE_KEY));
+    if (d && d.time) return d;
+  } catch(e) {}
+  return null;
+}
+
+async function updateLivePrice() {
+  const live = await fetchLiveGold();
+  renderLivePrice(live);
+}
+
+function startLivePolling() {
+  updateLivePrice();
+  liveTimer = setInterval(updateLivePrice, 60000);
+}
 
 // ========== DATA ==========
 async function loadData() {
   const cached = getCache();
-  if (cached) renderAll(cached);
+  if (cached) {
+    dailyData = cached;
+    renderAll(cached);
+  }
 
   try {
-    const res = await fetch(DATA_URL, { signal:AbortSignal.timeout(10000) });
+    const res = await fetch(DATA_URL, { signal: AbortSignal.timeout(10000) });
     if (res.ok) {
       const data = await res.json();
-      if (data.brands) { saveCache(data); renderAll(data); return; }
+      if (data.brands) {
+        dailyData = data;
+        saveCache(data);
+        renderAll(data);
+        return;
+      }
     }
   } catch(e) {}
 
@@ -238,7 +461,7 @@ async function loadData() {
 }
 
 function getCache() {
-  try { const d = JSON.parse(localStorage.getItem(CACHE_KEY)); return d; } catch { return null; }
+  try { return JSON.parse(localStorage.getItem(CACHE_KEY)); } catch { return null; }
 }
 function saveCache(d) { try { localStorage.setItem(CACHE_KEY, JSON.stringify(d)); } catch {} }
 
@@ -274,18 +497,15 @@ function renderAll(data) {
     const isTop = i === 0;
     const topClass = isTop ? ' top' : '';
 
-    // Purity class
     let purityClass = 'p999';
     if (b.purity === '足金9999') purityClass = 'p9999';
     else if (b.purity === '足金99999') purityClass = 'p99999';
 
-    // Change display
     const chg = b.priceChange || 0;
     const chgCls = chg > 0 ? 'up' : (chg < 0 ? 'down' : '');
     const arrow = chg > 0 ? '↑' : (chg < 0 ? '↓' : '');
     const chgText = chg !== 0 ? `${arrow} ¥${Math.abs(chg)}` : '持平';
 
-    // Yesterday price
     const prev = b.prevGoldPrice || b.goldPrice;
     const prevHtml = prev !== b.goldPrice
       ? `<div class="bp-prev">昨 ¥${prev}</div>`
@@ -310,6 +530,10 @@ function renderAll(data) {
       </div>
     </div>`;
   }).join('');
+
+  // 刷新实时金价对比（因为基准价可能更新了）
+  const cachedLive = getCachedLive();
+  if (cachedLive) renderLivePrice(cachedLive);
 }
 
 // ========== TREND CHART ==========
@@ -318,7 +542,6 @@ function renderTrend(history) {
   const labels = history.map(h => h.date);
   const prices = history.map(h => h.price);
 
-  // Calculate change
   const first = prices[0], last = prices[prices.length-1];
   const chg = last - first;
   const chgPct = ((chg / first) * 100).toFixed(2);
@@ -376,13 +599,22 @@ function renderTrend(history) {
 let ty = 0;
 document.addEventListener('touchstart', e=>{ty=e.touches[0].clientY}, {passive:true});
 document.addEventListener('touchend', e=>{
-  if (window.scrollY<=5 && e.changedTouches[0].clientY-ty>80) loadData();
+  if (window.scrollY<=5 && e.changedTouches[0].clientY-ty>80) {
+    updateLivePrice();
+    loadData();
+  }
 });
 
 setInterval(loadData, 30*60*1000);
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(()=>{});
 
-loadData();
+// 启动：先显示缓存的实时价，再加载数据，然后开始轮询
+const cachedLive = getCachedLive();
+if (cachedLive) renderLivePrice(cachedLive);
+
+loadData().then(() => {
+  startLivePolling();
+});
 </script>
 </body>
 </html>
