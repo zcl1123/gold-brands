@@ -1,25 +1,19 @@
 name: update-gold
-  on:
-    workflow_dispatch:
-    schedule:
-      - cron: 30 2 * * *
-
-  jobs:
-    update:
-      runs-on: ubuntu-latest
-      permissions:
-        contents: write
-      steps:
-        - uses: actions/checkout@v4
-        - uses: actions/setup-node@v4
-          with:
-            node-version: 20
-        - name: fetch prices
-          run: node scripts/update.js
-        - name: commit
-          run: |
-            git config user.name bot
-            git config user.email bot@github.com
-            git add data.json
-            git diff --staged --quiet || git commit -m "update"
-            git push
+on: [workflow_dispatch, schedule]
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: node scripts/update.js
+      - run: |
+          git config user.name bot
+          git config user.email bot@github.com
+          git add data.json
+          git diff --staged --quiet || git commit -m update
+          git push
