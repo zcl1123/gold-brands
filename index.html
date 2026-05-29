@@ -99,11 +99,13 @@
     }
     .live-box .lb-chg.up { color:var(--red); }
     .live-box .lb-chg.down { color:var(--green); }
-    .live-range {
-      display:flex; justify-content:center; gap:14px;
-      margin-top:8px; font-size:0.52rem; color:var(--muted);
+    .live-compare {
+      text-align:center; margin-top:8px; font-size:0.55rem; color:var(--muted);
+      line-height:1.6;
     }
-    .live-range span { color:var(--sub); }
+    .live-compare span { color:var(--sub); }
+    .live-compare .up { color:var(--red); font-weight:600; }
+    .live-compare .down { color:var(--green); font-weight:600; }
 
     /* ── Base Price Hero ── */
     .hero {
@@ -236,29 +238,29 @@
   </div>
   <div class="live-prices">
     <div class="live-box">
-      <div class="lb-code">Au99.99</div>
-      <div class="lb-price skeleton" id="lbAup" style="width:100px;margin:0 auto;">--</div>
-      <div class="lb-chg" id="lbAuc">--</div>
-    </div>
-    <div class="live-box">
-      <div class="lb-code">T+D 延期</div>
+      <div class="lb-code">黄金T+D</div>
       <div class="lb-price skeleton" id="lbTdp" style="width:100px;margin:0 auto;">--</div>
       <div class="lb-chg" id="lbTdc">--</div>
     </div>
+    <div class="live-box">
+      <div class="lb-code">原料 Au99.99</div>
+      <div class="lb-price skeleton" id="lbAup" style="width:100px;margin:0 auto;">--</div>
+      <div class="lb-chg" id="lbAuc">--</div>
+    </div>
   </div>
-  <div class="live-range" id="liveRange">--</div>
+  <div class="live-compare" id="liveCompare">--</div>
 </div>
 
-<!-- 大盘金价 -->
+<!-- Au99.99 大盘金价 -->
 <div class="hero" id="heroCard">
-  <div class="hero-badge">每日基准金价</div>
+  <div class="hero-badge">上海金交所 黄金T+D</div>
   <div class="hero-price skeleton" id="hPrice" style="width:180px;height:50px;margin:0 auto;">--</div>
   <div class="hero-row">
     <div>零售(金条) <span class="hv" id="hRetail">--</span></div>
     <div>回购价 <span class="hv bb" id="hBuyback">--</span></div>
     <div>品牌溢价 <span class="hv" style="color:#ff6d00;" id="hPremium">--</span></div>
   </div>
-  <div class="hero-note" id="hNote"></div>
+  <div class="hero-note"><span id="hNote"></span> · <span id="hHeroTime">--</span></div>
 </div>
 
 <!-- 5日趋势迷你图 -->
@@ -278,7 +280,7 @@
 
 <div class="footer">
   数据来源：金投网（cngold.org）品牌金店每日金价汇总<br>
-  实时金价来源：上海黄金交易所（东方财富行情）Au99.99 + T+D<br>
+  实时金价来源：上海黄金交易所（东方财富行情）黄金T+D + Au99.99<br>
   以上价格仅供参考 · 不含工费 · 以门店实际报价为准<br>
   <a href="https://m.cngold.org/gold/" target="_blank">查看金投网原始数据 →</a>
 </div>
@@ -334,8 +336,8 @@ function brandLogo(name) {
 }
 
 let trendChart = null;
-let dailyData = null;
 let liveTimer = null;
+let dailyBase = null;
 
 // ========== REAL-TIME DOMESTIC GOLD ==========
 async function fetchGoldQuote(secid) {
@@ -385,6 +387,7 @@ function renderLivePrices(data) {
   // Au99.99 价格
   const aup = document.getElementById('lbAup');
   const auc = document.getElementById('lbAuc');
+
   if (data.au) {
     aup.innerHTML = '¥' + data.au.price.toFixed(2) + '<span class="u">/克</span>';
     aup.classList.remove('skeleton'); aup.style = '';
@@ -393,6 +396,9 @@ function renderLivePrices(data) {
     const arrow = data.au.change >= 0 ? '↑' : '↓';
     auc.innerHTML = `<span class="${dir}">${arrow} ${sign}${data.au.change.toFixed(2)} (${sign}${data.au.changePct.toFixed(2)}%)</span>`;
     auc.classList = 'lb-chg';
+
+    // 同步更新 Hero 卡片 - 用 T+D 数据（与抖音一致）
+    updateHeroWithLive(data.td || data.au);
   } else {
     aup.textContent = '--';
     auc.textContent = '获取失败';
@@ -414,17 +420,58 @@ function renderLivePrices(data) {
     tdc.textContent = '获取失败';
   }
 
-  // 区间信息（取 Au99.99 数据）
-  const range = document.getElementById('liveRange');
-  if (data.au) {
-    range.innerHTML = `今开 <span>${data.au.open.toFixed(2)}</span> 最高 <span style="color:#ff5252">${data.au.high.toFixed(2)}</span> 最低 <span style="color:#00e676">${data.au.low.toFixed(2)}</span> 昨收 <span>${data.au.prevClose.toFixed(2)}</span>`;
-  } else {
-    range.textContent = '--';
+  // 底部：OHLC + 基准对比（使用 T+D 数据，与抖音一致）
+  const compare = document.getElementById('liveCompare');
+  let parts = [];
+
+  const ref = data.td || data.au;
+  if (ref) {
+    parts.push(`今开 <span>${ref.open.toFixed(2)}</span> 最高 <span style="color:#ff5252">${ref.high.toFixed(2)}</span> 最低 <span style="color:#00e676">${ref.low.toFixed(2)}</span> 昨收 <span>${ref.prevClose.toFixed(2)}</span>`);
+
+    if (dailyBase) {
+      const diff = ref.price - dailyBase;
+      const diffPct = ((diff / dailyBase) * 100);
+      if (Math.abs(diff) > 0.01) {
+        const isUp = diff > 0;
+        const cls = isUp ? 'up' : 'down';
+        const sign = isUp ? '+' : '';
+        parts.push(`较昨收 <span class="${cls}">${sign}¥${diff.toFixed(2)} (${sign}${diffPct.toFixed(2)}%)</span>`);
+      } else {
+        parts.push(`较昨收 持平`);
+      }
+    }
   }
+
+  compare.innerHTML = parts.join('<br>') + '<br>更新于 ' + data.time.toLocaleTimeString('zh-CN', {hour12: false}) || '--';
 
   // 缓存
   const cache = { au: data.au, td: data.td, time: data.time.toISOString() };
   try { localStorage.setItem(LIVE_CACHE_KEY, JSON.stringify(cache)); } catch(e) {}
+}
+
+let avgBrandPrice = 0;
+
+function updateHeroWithLive(au) {
+  const hPrice = document.getElementById('hPrice');
+  hPrice.textContent = '¥' + au.price.toFixed(2);
+  hPrice.classList.remove('skeleton'); hPrice.style = '';
+
+  // 零售金条价 = 实时价 + 约16元
+  const retail = au.price + 16;
+  document.getElementById('hRetail').textContent = '¥' + retail.toFixed(2) + '/克';
+
+  // 回购价 = 实时价 - 约3元
+  const buyback = au.price - 3;
+  document.getElementById('hBuyback').textContent = '¥' + buyback.toFixed(2) + '/克';
+
+  // 品牌溢价
+  if (avgBrandPrice > 0) {
+    document.getElementById('hPremium').textContent = '+¥' + Math.round(avgBrandPrice - au.price) + '/克';
+  }
+
+  dailyBase = au.prevClose;
+  document.getElementById('hNote').textContent = '上海金交所 黄金T+D · 昨收 ¥' + au.prevClose.toFixed(2);
+  document.getElementById('hHeroTime').textContent = '更新 ' + new Date().toLocaleTimeString('zh-CN', {hour12: false});
 }
 
 function renderCachedLive() {
@@ -479,18 +526,24 @@ function renderAll(data) {
   document.getElementById('errBar').classList.remove('show');
   document.getElementById('hDate').textContent = data.updateDate || '--';
 
-  // Hero: base price
+  // Hero: 先显示 data.json 基准（实时数据到达后会覆盖）
   if (data.basePrice) {
     const bp = data.basePrice;
-    document.getElementById('hPrice').textContent = '¥' + bp.price.toFixed(2);
-    document.getElementById('hPrice').classList.remove('skeleton');
-    document.getElementById('hPrice').style = '';
-    document.getElementById('hRetail').textContent = '¥' + bp.retailPrice?.toFixed(2) + '/克';
-    document.getElementById('hBuyback').textContent = '¥' + bp.buybackPrice?.toFixed(2) + '/克';
-    document.getElementById('hNote').textContent = bp.description || '';
-
-    const avgBrand = data.brands.reduce((s,b)=>s+b.goldPrice,0) / data.brands.length;
-    document.getElementById('hPremium').textContent = '+¥' + Math.round(avgBrand - bp.price) + '/克';
+    // 如果实时数据还没到，先显示估算基准
+    if (!dailyBase) {
+      document.getElementById('hPrice').textContent = '¥' + bp.price.toFixed(2);
+      document.getElementById('hPrice').classList.remove('skeleton');
+      document.getElementById('hPrice').style = '';
+      document.getElementById('hRetail').textContent = '¥' + bp.retailPrice?.toFixed(2) + '/克';
+      document.getElementById('hBuyback').textContent = '¥' + bp.buybackPrice?.toFixed(2) + '/克';
+      document.getElementById('hNote').textContent = bp.description || '';
+      dailyBase = bp.price;
+    }
+    // 保存品牌均价用于溢价计算
+    avgBrandPrice = data.brands.reduce((s,b)=>s+b.goldPrice,0) / data.brands.length;
+    if (!dailyBase || dailyBase === bp.price) {
+      document.getElementById('hPremium').textContent = '+¥' + Math.round(avgBrandPrice - dailyBase) + '/克';
+    }
   }
 
   // Trend chart
