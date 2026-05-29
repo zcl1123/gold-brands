@@ -1,4 +1,4 @@
-﻿const CACHE_NAME = 'gold-brands-v2';
+﻿const CACHE_NAME = 'gold-brands-v3';
 const ASSETS = [
   './',
   './index.html',
