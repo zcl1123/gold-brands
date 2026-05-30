@@ -155,7 +155,7 @@ function buildFullData(extractedPrices) {
   const lastEntry = history[history.length - 1];
   if (!lastEntry || lastEntry.date !== today) {
     history.push({ date: today, price: basePrice });
-    if (history.length > 7) history = history.slice(-7);
+    if (history.length > 5) history = history.slice(-5);
   } else {
     lastEntry.price = basePrice;
   }
