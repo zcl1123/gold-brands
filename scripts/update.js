@@ -1,5 +1,5 @@
 // 品牌金价数据更新脚本
-// 从金投网抓取每日品牌金价，生成 data.json
+// 从金投网品牌子站抓取每日品牌金价，生成 data.json
 const https = require('https');
 const fs = require('fs');
 const path = require('path');
@@ -8,21 +8,31 @@ const OUTPUT = path.join(__dirname, '..', 'data.json');
 
 // 品牌元数据
 const BRAND_META = {
-  '老凤祥':    { purity:'足金999',  aliases:[], local:'全国·川内门店多' },
-  '周大福':    { purity:'足金9999', aliases:[], local:'全国·春熙路/金牛有店' },
-  '爱心金店':  { purity:'足金999',  aliases:[], local:'成都本地·琴台路总店' },
-  '周大生':    { purity:'足金999',  aliases:[], local:'全国·川内门店多' },
-  '中国黄金':  { purity:'足金9999', aliases:[], local:'全国·琴台路有店' },
-  '周六福':    { purity:'足金999',  aliases:[], local:'全国·川内门店多' },
-  '天鑫金店':  { purity:'足金999',  aliases:[], local:'成都本地·30年老店' },
-  '六福珠宝':  { purity:'足金999',  aliases:[], local:'全国·成都商圈有店' },
-  '老庙黄金':  { purity:'足金999',  aliases:[], local:'全国·成都商圈有店' },
-  '周生生':    { purity:'足金9999', aliases:[], local:'全国·成都商圈有店' },
-  '潮宏基':    { purity:'足金999',  aliases:[], local:'全国·川内门店多' },
-  '蓉城金殿':  { purity:'足金999',  aliases:[], local:'成都本地·12家直营店' },
-  '谢瑞麟':    { purity:'足金9999', aliases:[], local:'全国·成都商圈有店' },
-  '金至尊':    { purity:'足金999',  aliases:[], local:'全国·成都商圈有店' },
-  '梦金园':    { purity:'足金999',  aliases:[], local:'全国·川内部分城市' }
+  '老凤祥':    { purity:'足金999',  local:'全国·川内门店多' },
+  '周大福':    { purity:'足金9999', local:'全国·春熙路/金牛有店' },
+  '爱心金店':  { purity:'足金999',  local:'成都本地·琴台路总店' },
+  '周大生':    { purity:'足金999',  local:'全国·川内门店多' },
+  '中国黄金':  { purity:'足金9999', local:'全国·琴台路有店' },
+  '周六福':    { purity:'足金999',  local:'全国·川内门店多' },
+  '天鑫金店':  { purity:'足金999',  local:'成都本地·30年老店' },
+  '六福珠宝':  { purity:'足金999',  local:'全国·成都商圈有店' },
+  '老庙黄金':  { purity:'足金999',  local:'全国·成都商圈有店' },
+  '周生生':    { purity:'足金9999', local:'全国·成都商圈有店' },
+  '潮宏基':    { purity:'足金999',  local:'全国·川内门店多' },
+  '蓉城金殿':  { purity:'足金999',  local:'成都本地·12家直营店' },
+  '谢瑞麟':    { purity:'足金9999', local:'全国·成都商圈有店' },
+  '金至尊':    { purity:'足金999',  local:'全国·成都商圈有店' },
+  '梦金园':    { purity:'足金999',  local:'全国·川内部分城市' }
+};
+
+// 品牌子站 URL（部分品牌没有独立子站，通过有数据品牌的均价推算）
+const BRAND_URLS = {
+  '周大福':   'https://m.cngold.org/home/lm47/',
+  '老凤祥':   'https://m.cngold.org/home/lm48/',
+  '周生生':   'https://m.cngold.org/home/lm71/',
+  '周六福':   'https://m.cngold.org/home/lm76/',
+  '金至尊':   'https://m.cngold.org/home/lm73/',
+  '老庙黄金': 'https://m.cngold.org/home/lm74/',
 };
 
 function fetch(url) {
@@ -35,37 +45,47 @@ function fetch(url) {
   });
 }
 
-function extractPrices(html) {
-  const brands = [];
-  // 匹配品牌名和价格行：<td>品牌名</td><td>价格</td>
-  const rowRe = /<td[^>]*>\s*<a[^>]*>([^<]+)<\/a>\s*<\/td>\s*<td[^>]*>\s*<span[^>]*>(\d+)<\/span>/gi;
+function extractBrandPrice(html) {
+  // 品牌子站页面：最新金价在 <dt class="title"> 中
+  // 格式："2026年5月29日老凤祥黄金报1365.0元/克 较月初下跌3.19%"
+  const dtRe = /<dt class="title[^"]*">([\s\S]*?)<\/dt>/gi;
   let m;
-  while ((m = rowRe.exec(html)) !== null) {
-    const name = m[1].trim();
-    const price = parseInt(m[2]);
-    if (BRAND_META[name] && price > 100 && price < 3000) {
-      brands.push({ name, goldPrice: price });
+  while ((m = dtRe.exec(html)) !== null) {
+    const title = m[1];
+    // 跳过行情周报标题
+    if (title.includes('行情周报')) continue;
+    const priceRe = /(\d+(?:\.\d+)?)\s*元\/克/;
+    const pm = title.match(priceRe);
+    if (pm) {
+      const price = parseFloat(pm[1]);
+      if (price > 100 && price < 3000) {
+        return Math.round(price);
+      }
     }
   }
-  return brands;
+  return null;
 }
 
-function extractBasePriceUrl(html) {
-  const re = /href="(\/gold\/\d+\.html)"/;
-  const m = html.match(re);
-  return m ? 'https://m.cngold.org' + m[1] : null;
-}
-
-function extractBasePrice(html) {
-  // 提取基础金价：回购价、零售价、基础价
-  const re = /<span[^>]*>(\d+\.?\d*)<\/span>/g;
-  const nums = [];
-  let m;
-  while ((m = re.exec(html)) !== null) {
-    const v = parseFloat(m[1]);
-    if (v > 100 && v < 2000) nums.push(v);
-  }
-  return nums;
+async function extractAllPrices() {
+  const entries = Object.entries(BRAND_URLS);
+  const results = await Promise.all(
+    entries.map(async ([name, url]) => {
+      try {
+        const html = await fetch(url);
+        const price = extractBrandPrice(html);
+        if (price) {
+          console.log('  ' + name + ': ¥' + price);
+          return { name, goldPrice: price };
+        }
+        console.log('  ' + name + ': 未提取到价格');
+        return null;
+      } catch (e) {
+        console.log('  ' + name + ': 请求失败 - ' + e.message);
+        return null;
+      }
+    })
+  );
+  return results.filter(r => r !== null);
 }
 
 function formatDate(d) {
@@ -95,17 +115,15 @@ function buildFullData(extractedPrices) {
   const extractedMap = {};
   extractedPrices.forEach(p => { extractedMap[p.name] = p.goldPrice; });
 
-  // 按价格排序提取到的品牌，确定价格层级
+  // 按价格排序提取到的品牌，确定价格区间
   const sorted = [...extractedPrices].sort((a, b) => b.goldPrice - a.goldPrice);
   const maxP = sorted[0]?.goldPrice || 1355;
   const minP = sorted[sorted.length - 1]?.goldPrice || 1342;
 
-  // 填充所有品牌
+  // 填充所有品牌（有实价的用实价，没有的按价格层级估算）
   const allBrands = Object.keys(BRAND_META).map(name => {
     let goldPrice = extractedMap[name];
     if (!goldPrice) {
-      // 根据已知品牌推算未知品牌价格
-      const meta = BRAND_META[name];
       const idx = Object.keys(BRAND_META).indexOf(name);
       goldPrice = Math.round(minP + (maxP - minP) * (1 - idx / (Object.keys(BRAND_META).length - 1)));
     }
@@ -125,13 +143,13 @@ function buildFullData(extractedPrices) {
 
   allBrands.sort((a, b) => b.goldPrice - a.goldPrice);
 
-  // 基础金价
+  // 基础金价 = 品牌均价 - 品牌溢价（约385元）
   const avgBrand = allBrands.reduce((s, b) => s + b.goldPrice, 0) / allBrands.length;
-  const basePrice = Math.round(avgBrand - 385); // 品牌溢价约385元
+  const basePrice = Math.round(avgBrand - 385);
   const retailPrice = basePrice + 16;
   const buybackPrice = basePrice - 3;
 
-  // 历史数据
+  // 历史走势
   let history = existing?.basePriceHistory || [];
   const today = formatDateShort(new Date());
   const lastEntry = history[history.length - 1];
@@ -167,18 +185,11 @@ async function main() {
   console.log('开始更新品牌金价数据...');
 
   try {
-    // 抓取金投网品牌金价页面
-    const html = await fetch('https://m.cngold.org/gold/');
+    const extracted = await extractAllPrices();
+    console.log('提取到 ' + extracted.length + ' 个品牌价格（有实价）');
 
-    // 提取品牌价格
-    const extracted = extractPrices(html);
-    console.log('提取到 ' + extracted.length + ' 个品牌价格:');
-    extracted.forEach(b => console.log('  ' + b.name + ': ¥' + b.goldPrice));
-
-    // 构建完整数据
     const data = buildFullData(extracted);
 
-    // 写入文件
     fs.writeFileSync(OUTPUT, JSON.stringify(data, null, 2), 'utf8');
     console.log('\n数据已写入: ' + OUTPUT);
     console.log('品牌数: ' + data.brands.length);

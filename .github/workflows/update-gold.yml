@@ -1,5 +1,8 @@
 name: update-gold
-on: [workflow_dispatch, schedule]
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '30 2 * * *'
 jobs:
   update:
     runs-on: ubuntu-latest
