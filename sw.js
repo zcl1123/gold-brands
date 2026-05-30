@@ -1,4 +1,4 @@
-const CACHE_NAME = 'gold-brands-v4';
+const CACHE_NAME = 'gold-brands-v5';
 const ASSETS = [
   './',
   './index.html',
@@ -23,8 +23,8 @@ self.addEventListener('activate', e => {
 self.addEventListener('fetch', e => {
   if (e.request.method !== 'GET') return;
 
-  // HTML 用网络优先策略，确保总是拿到最新版
-  if (e.request.destination === 'document' || e.request.url.endsWith('.html') || e.request.url.endsWith('/')) {
+  // HTML 和 data.json 用网络优先策略，确保总是拿到最新版
+  if (e.request.destination === 'document' || e.request.url.endsWith('.html') || e.request.url.endsWith('/') || e.request.url.endsWith('data.json')) {
     e.respondWith(
       fetch(e.request)
         .then(res => {
