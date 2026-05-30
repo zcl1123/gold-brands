@@ -16,6 +16,10 @@
   },
   "basePriceHistory": [
     {
+      "date": "05-25",
+      "price": 992.5
+    },
+    {
       "date": "05-26",
       "price": 988.3
     },
