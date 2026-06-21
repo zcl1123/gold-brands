@@ -1,6 +1,6 @@
 {
-  "updateDate": "2026/6/20",
-  "updateTime": "2026/6/20 11:04:24",
+  "updateDate": "2026/6/21",
+  "updateTime": "2026/6/21 12:00:06",
   "source": "金投网 cngold.org — 品牌金店每日金价汇总",
   "sourceUrl": "https://m.cngold.org/gold/",
   "region": "四川省",
@@ -15,10 +15,6 @@
     "description": "中国黄金投资金条基础金价（上海黄金交易所Au99.99参考价）"
   },
   "basePriceHistory": [
-    {
-      "date": "06-15",
-      "price": 883
-    },
     {
       "date": "06-16",
       "price": 919
@@ -38,6 +34,10 @@
     {
       "date": "06-20",
       "price": 883
+    },
+    {
+      "date": "06-21",
+      "price": 883
     }
   ],
   "brands": [
@@ -54,7 +54,7 @@
       "name": "周生生",
       "goldPrice": 1272,
       "prevGoldPrice": 1272,
-      "buybackPrice": 1249,
+      "buybackPrice": 1252,
       "purity": "足金9999",
       "priceChange": 0,
       "local": "全国·成都商圈有店"
@@ -63,7 +63,7 @@
       "name": "爱心金店",
       "goldPrice": 1271,
       "prevGoldPrice": 1271,
-      "buybackPrice": 1249,
+      "buybackPrice": 1247,
       "purity": "足金999",
       "priceChange": 0,
       "local": "成都本地·琴台路总店"
@@ -72,7 +72,7 @@
       "name": "周大生",
       "goldPrice": 1271,
       "prevGoldPrice": 1271,
-      "buybackPrice": 1248,
+      "buybackPrice": 1251,
       "purity": "足金999",
       "priceChange": 0,
       "local": "全国·川内门店多"
@@ -81,7 +81,7 @@
       "name": "中国黄金",
       "goldPrice": 1270,
       "prevGoldPrice": 1270,
-      "buybackPrice": 1245,
+      "buybackPrice": 1246,
       "purity": "足金9999",
       "priceChange": 0,
       "local": "全国·琴台路有店"
@@ -90,7 +90,7 @@
       "name": "金至尊",
       "goldPrice": 1270,
       "prevGoldPrice": 1270,
-      "buybackPrice": 1247,
+      "buybackPrice": 1248,
       "purity": "足金999",
       "priceChange": 0,
       "local": "全国·成都商圈有店"
@@ -99,7 +99,7 @@
       "name": "天鑫金店",
       "goldPrice": 1269,
       "prevGoldPrice": 1269,
-      "buybackPrice": 1246,
+      "buybackPrice": 1247,
       "purity": "足金999",
       "priceChange": 0,
       "local": "成都本地·30年老店"
@@ -108,7 +108,7 @@
       "name": "六福珠宝",
       "goldPrice": 1269,
       "prevGoldPrice": 1269,
-      "buybackPrice": 1248,
+      "buybackPrice": 1246,
       "purity": "足金999",
       "priceChange": 0,
       "local": "全国·成都商圈有店"
@@ -117,7 +117,7 @@
       "name": "周六福",
       "goldPrice": 1267,
       "prevGoldPrice": 1267,
-      "buybackPrice": 1242,
+      "buybackPrice": 1243,
       "purity": "足金999",
       "priceChange": 0,
       "local": "全国·川内门店多"
@@ -126,7 +126,7 @@
       "name": "潮宏基",
       "goldPrice": 1267,
       "prevGoldPrice": 1267,
-      "buybackPrice": 1246,
+      "buybackPrice": 1247,
       "purity": "足金999",
       "priceChange": 0,
       "local": "全国·川内门店多"
@@ -144,7 +144,7 @@
       "name": "谢瑞麟",
       "goldPrice": 1266,
       "prevGoldPrice": 1266,
-      "buybackPrice": 1243,
+      "buybackPrice": 1245,
       "purity": "足金9999",
       "priceChange": 0,
       "local": "全国·成都商圈有店"
@@ -153,7 +153,7 @@
       "name": "老凤祥",
       "goldPrice": 1265,
       "prevGoldPrice": 1265,
-      "buybackPrice": 1243,
+      "buybackPrice": 1244,
       "purity": "足金999",
       "priceChange": 0,
       "local": "全国·川内门店多"
