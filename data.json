@@ -1,6 +1,6 @@
 {
-  "updateDate": "2026/7/19",
-  "updateTime": "2026/7/19 05:35:22",
+  "updateDate": "2026/7/20",
+  "updateTime": "2026/7/20 05:52:08",
   "source": "金投网 cngold.org — 品牌金店每日金价汇总",
   "sourceUrl": "https://m.cngold.org/gold/",
   "region": "四川省",
@@ -15,10 +15,6 @@
     "description": "中国黄金投资金条基础金价（上海黄金交易所Au99.99参考价）"
   },
   "basePriceHistory": [
-    {
-      "date": "07-14",
-      "price": 868
-    },
     {
       "date": "07-15",
       "price": 830
@@ -38,6 +34,10 @@
     {
       "date": "07-19",
       "price": 828
+    },
+    {
+      "date": "07-20",
+      "price": 828
     }
   ],
   "brands": [
@@ -45,7 +45,7 @@
       "name": "老凤祥",
       "goldPrice": 1215,
       "prevGoldPrice": 1215,
-      "buybackPrice": 1193,
+      "buybackPrice": 1194,
       "purity": "足金999",
       "priceChange": 0,
       "local": "全国·川内门店多"
@@ -54,7 +54,7 @@
       "name": "周大福",
       "goldPrice": 1215,
       "prevGoldPrice": 1215,
-      "buybackPrice": 1191,
+      "buybackPrice": 1190,
       "purity": "足金9999",
       "priceChange": 0,
       "local": "全国·春熙路/金牛有店"
@@ -63,7 +63,7 @@
       "name": "爱心金店",
       "goldPrice": 1214,
       "prevGoldPrice": 1214,
-      "buybackPrice": 1193,
+      "buybackPrice": 1191,
       "purity": "足金999",
       "priceChange": 0,
       "local": "成都本地·琴台路总店"
@@ -72,7 +72,7 @@
       "name": "周大生",
       "goldPrice": 1214,
       "prevGoldPrice": 1214,
-      "buybackPrice": 1190,
+      "buybackPrice": 1194,
       "purity": "足金999",
       "priceChange": 0,
       "local": "全国·川内门店多"
@@ -81,7 +81,7 @@
       "name": "中国黄金",
       "goldPrice": 1214,
       "prevGoldPrice": 1214,
-      "buybackPrice": 1191,
+      "buybackPrice": 1192,
       "purity": "足金9999",
       "priceChange": 0,
       "local": "全国·琴台路有店"
@@ -90,7 +90,7 @@
       "name": "天鑫金店",
       "goldPrice": 1213,
       "prevGoldPrice": 1213,
-      "buybackPrice": 1192,
+      "buybackPrice": 1188,
       "purity": "足金999",
       "priceChange": 0,
       "local": "成都本地·30年老店"
@@ -99,7 +99,7 @@
       "name": "六福珠宝",
       "goldPrice": 1213,
       "prevGoldPrice": 1213,
-      "buybackPrice": 1192,
+      "buybackPrice": 1190,
       "purity": "足金999",
       "priceChange": 0,
       "local": "全国·成都商圈有店"
@@ -108,7 +108,7 @@
       "name": "金至尊",
       "goldPrice": 1213,
       "prevGoldPrice": 1213,
-      "buybackPrice": 1191,
+      "buybackPrice": 1188,
       "purity": "足金999",
       "priceChange": 0,
       "local": "全国·成都商圈有店"
@@ -117,7 +117,7 @@
       "name": "老庙黄金",
       "goldPrice": 1212,
       "prevGoldPrice": 1212,
-      "buybackPrice": 1188,
+      "buybackPrice": 1187,
       "purity": "足金999",
       "priceChange": 0,
       "local": "全国·成都商圈有店"
@@ -126,7 +126,7 @@
       "name": "周生生",
       "goldPrice": 1212,
       "prevGoldPrice": 1212,
-      "buybackPrice": 1187,
+      "buybackPrice": 1191,
       "purity": "足金9999",
       "priceChange": 0,
       "local": "全国·成都商圈有店"
@@ -135,7 +135,7 @@
       "name": "潮宏基",
       "goldPrice": 1211,
       "prevGoldPrice": 1211,
-      "buybackPrice": 1186,
+      "buybackPrice": 1189,
       "purity": "足金999",
       "priceChange": 0,
       "local": "全国·川内门店多"
@@ -144,7 +144,7 @@
       "name": "蓉城金殿",
       "goldPrice": 1211,
       "prevGoldPrice": 1211,
-      "buybackPrice": 1189,
+      "buybackPrice": 1186,
       "purity": "足金999",
       "priceChange": 0,
       "local": "成都本地·12家直营店"
@@ -153,7 +153,7 @@
       "name": "谢瑞麟",
       "goldPrice": 1211,
       "prevGoldPrice": 1211,
-      "buybackPrice": 1189,
+      "buybackPrice": 1186,
       "purity": "足金9999",
       "priceChange": 0,
       "local": "全国·成都商圈有店"
@@ -162,7 +162,7 @@
       "name": "周六福",
       "goldPrice": 1210,
       "prevGoldPrice": 1210,
-      "buybackPrice": 1190,
+      "buybackPrice": 1187,
       "purity": "足金999",
       "priceChange": 0,
       "local": "全国·川内门店多"
@@ -171,7 +171,7 @@
       "name": "梦金园",
       "goldPrice": 1210,
       "prevGoldPrice": 1210,
-      "buybackPrice": 1189,
+      "buybackPrice": 1187,
       "purity": "足金999",
       "priceChange": 0,
       "local": "全国·川内部分城市"
